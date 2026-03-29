@@ -88,11 +88,8 @@
   #loadingOverlay { position:fixed; inset:0; background:var(--bg); z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; }
   .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
   @keyframes spin { to { transform:rotate(360deg); } }
-  .rich-text p { margin-bottom: 0.5em; }
-  .rich-text p:last-child { margin-bottom: 0; }
-  .rich-text ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5em; }
-  .rich-text ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.5em; }
-  .rich-text a { color: var(--blue); text-decoration: underline; }
+  .ql-editor { min-height: unset; padding: 0 !important; font-family: 'Inter', sans-serif; font-size: 14px; overflow-y: visible; }
+  #ideaModalText .ql-editor { min-height: 120px; padding: 12px 15px !important; overflow-y: auto; }
   .ql-toolbar { border-radius: 8px 8px 0 0; background: #f8fafc; border-color: var(--border) !important; padding: 4px 8px !important; }
   .ql-container { border-radius: 0 0 8px 8px; border-color: var(--border) !important; font-family: 'Inter', sans-serif !important; font-size: .85rem !important; }
   .ql-editor { min-height: 120px; }
@@ -425,7 +422,7 @@ function renderIdea(idea,stepId){
   const tested=(idea.testers||[]).find(t=>t.email===currentUser.email);
   const isOwn=idea.authorEmail===currentUser.email;
   return `<div class="idea-card rounded-lg p-3">
-  <div class="rich-text mb-1" style="font-size:14px;color:#475569;line-height:1.6;">${formatIdeaText(idea)}</div>
+  <div class="ql-snow mb-1"><div class="ql-editor" style="color:#475569;line-height:1.6;">${formatIdeaText(idea)}</div></div>
   <p class="mb-2" style="font-size:11px;color:#94a3b8" title="${escH(idea.authorEmail)}">${escH(idea.authorName)}</p>
   ${isOwn?`<div class="flex gap-3 mb-2"><button onclick="openEditIdeaModal('${idea.id}')" class="text-xs underline" style="color:var(--text-3)">Edit</button><button onclick="deleteIdea('${idea.id}')" class="text-xs underline" style="color:var(--red)">Delete</button></div>`:''}
   <div class="flex flex-wrap items-center gap-2 mt-1">
@@ -489,9 +486,10 @@ function renderSumList(tab){
   const topBar=(ctx,btn)=>`<div class="flex items-start justify-between mb-2"><div class="leading-5" style="font-size:11px">${ctx}</div>${btn||''}</div>`;
   const wBtn=(oc,col,bdr)=>`<button onclick="${oc}" class="text-xs rounded px-2 py-1 flex-shrink-0 ml-3" style="color:${col};border:1px solid ${bdr}">Withdraw</button>`;
   let html='';
-  if(tab==='vote')html=voted.map(({idea,ctx})=>card(`${topBar(ctx,wBtn(`summaryWithdrawVote('${idea.id}')`, 'var(--amber)','rgba(217,119,6,.3)'))}<div class="rich-text" style="font-size:.9rem;color:var(--text);">${formatIdeaText(idea)}</div>`)).join('');
-  else if(tab==='build')html=building.map(({idea,ctx,domain,appDetails})=>card(`${topBar(ctx,wBtn(`summaryWithdrawBuild('${idea.id}')`, 'var(--emerald)','rgba(5,150,105,.3)'))}<div class="rich-text" style="font-size:.9rem;color:var(--text);">${formatIdeaText(idea)}</div>${appDetails?`<p class="mt-2 text-xs" style="color:var(--text-3);white-space:pre-wrap;">${escH(appDetails)}</p>`:''} ${domain?`<span class="tag-domain mt-2 inline-block">${escH(domain)}</span>`:''} ${pLine('Also building',idea.builders.filter(b=>b.email!==currentUser.email))}${pLine('🧪 Testers',idea.testers)}`)).join('');
-  else html=testing.map(({idea,ctx})=>card(`${topBar(ctx,null)}<div class="rich-text" style="font-size:.9rem;color:var(--text);">${formatIdeaText(idea)}</div>${pLine('🔨 Builders',idea.builders)}${pLine('Also testing',idea.testers.filter(t=>t.email!==currentUser.email))}`)).join('');
+  const ql=(html)=>`<div class="ql-snow"><div class="ql-editor" style="font-size:.9rem;color:var(--text);">${html}</div></div>`;
+  if(tab==='vote')html=voted.map(({idea,ctx})=>card(`${topBar(ctx,wBtn(`summaryWithdrawVote('${idea.id}')`, 'var(--amber)','rgba(217,119,6,.3)'))}${ql(formatIdeaText(idea))}`)).join('');
+  else if(tab==='build')html=building.map(({idea,ctx,domain,appDetails})=>card(`${topBar(ctx,wBtn(`summaryWithdrawBuild('${idea.id}')`, 'var(--emerald)','rgba(5,150,105,.3)'))}${ql(formatIdeaText(idea))}${appDetails?`<p class="mt-2 text-xs" style="color:var(--text-3);white-space:pre-wrap;">${escH(appDetails)}</p>`:''} ${domain?`<span class="tag-domain mt-2 inline-block">${escH(domain)}</span>`:''} ${pLine('Also building',idea.builders.filter(b=>b.email!==currentUser.email))}${pLine('🧪 Testers',idea.testers)}`)).join('');
+  else html=testing.map(({idea,ctx})=>card(`${topBar(ctx,null)}${ql(formatIdeaText(idea))}${pLine('🔨 Builders',idea.builders)}${pLine('Also testing',idea.testers.filter(t=>t.email!==currentUser.email))}`)).join('');
   panel.innerHTML=html;
 }
 function setActiveSummaryTab(tab){ renderSumList(tab); }
@@ -523,7 +521,7 @@ function renderAdminTable(){
   });
   const tbody=document.getElementById('adminTbody'); if(!tbody)return;
   if(!filtered.length){tbody.innerHTML=`<tr><td colspan="5" class="px-3 py-6 text-center text-sm italic" style="color:var(--text-3)">No matching ideas</td></tr>`;return;}
-  tbody.innerHTML=filtered.map(({idea,milestone,step})=>`<tr style="border-top:1px solid var(--border)"><td class="px-3 py-2"><div class="rich-text" style="font-size:12px;color:var(--text);line-height:1.5;">${formatIdeaText(idea)}</div></td><td class="px-3 py-2"><div class="text-xs" style="color:var(--text-2)">${escH(milestone)}</div><div class="text-xs" style="color:var(--text-3)">↳ ${escH(step)}</div></td><td class="px-3 py-2 text-center"><span class="font-semibold" style="color:var(--accent)">${(idea.votes||[]).length}</span></td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.builders||[]).length>0?(idea.builders||[]).map(b=>`${escH(b.name)}${b.domain?' · '+escH(b.domain):''}`).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.testers||[]).length>0?(idea.testers||[]).map(t=>escH(t.name)).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td></tr>`).join('');
+  tbody.innerHTML=filtered.map(({idea,milestone,step})=>`<tr style="border-top:1px solid var(--border)"><td class="px-3 py-2"><div class="ql-snow"><div class="ql-editor" style="font-size:12px;color:var(--text);line-height:1.5;">${formatIdeaText(idea)}</div></div></td><td class="px-3 py-2"><div class="text-xs" style="color:var(--text-2)">${escH(milestone)}</div><div class="text-xs" style="color:var(--text-3)">↳ ${escH(step)}</div></td><td class="px-3 py-2 text-center"><span class="font-semibold" style="color:var(--accent)">${(idea.votes||[]).length}</span></td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.builders||[]).length>0?(idea.builders||[]).map(b=>`${escH(b.name)}${b.domain?' · '+escH(b.domain):''}`).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.testers||[]).length>0?(idea.testers||[]).map(t=>escH(t.name)).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td></tr>`).join('');
   ['noBuilders','noTesters'].forEach(key=>{ const btn=document.getElementById('adminFilter_'+key); if(!btn)return; if(_adminFilters[key]){btn.style.background='#ede9fe';btn.style.color='#4f46e5';btn.style.borderColor='#c7d2fe';}else{btn.style.background='';btn.style.color='#64748b';btn.style.borderColor='#e2e8f0';} });
 }
 function toggleAdminFilter(key){ _adminFilters[key]=!_adminFilters[key]; renderAdminTable(); }
