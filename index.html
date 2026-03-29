@@ -425,7 +425,7 @@ function renderIdea(idea,stepId){
   const tested=(idea.testers||[]).find(t=>t.email===currentUser.email);
   const isOwn=idea.authorEmail===currentUser.email;
   return `<div class="idea-card rounded-lg p-3">
-  <div class="rich-text font-semibold mb-1" style="font-size:14px;color:#475569;line-height:1.6;">${formatIdeaText(idea)}</div>
+  <div class="rich-text mb-1" style="font-size:14px;color:#475569;line-height:1.6;">${formatIdeaText(idea)}</div>
   <p class="mb-2" style="font-size:11px;color:#94a3b8" title="${escH(idea.authorEmail)}">${escH(idea.authorName)}</p>
   ${isOwn?`<div class="flex gap-3 mb-2"><button onclick="openEditIdeaModal('${idea.id}')" class="text-xs underline" style="color:var(--text-3)">Edit</button><button onclick="deleteIdea('${idea.id}')" class="text-xs underline" style="color:var(--red)">Delete</button></div>`:''}
   <div class="flex flex-wrap items-center gap-2 mt-1">
