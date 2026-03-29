@@ -405,7 +405,7 @@ function renderIdea(idea,stepId){
   const tested=(idea.testers||[]).find(t=>t.email===currentUser.email);
   const isOwn=idea.authorEmail===currentUser.email;
   return `<div class="idea-card rounded-lg p-3">
-  <p class="font-semibold mb-1" style="font-size:14px;color:#475569;line-height:1.6">${escH(idea.text)}</p>
+  <p class="font-semibold mb-1" style="font-size:14px;color:#475569;line-height:1.6;white-space:pre-wrap;">${escH(idea.text)}</p>
   <p class="mb-2" style="font-size:11px;color:#94a3b8" title="${escH(idea.authorEmail)}">${escH(idea.authorName)}</p>
   ${isOwn?`<button onclick="openEditIdeaModal('${idea.id}')" class="text-xs underline mb-2 block" style="color:var(--text-3)">Edit</button>`:''}
   <div class="flex flex-wrap items-center gap-2 mt-1">
@@ -466,9 +466,9 @@ function renderSumList(tab){
   const topBar=(ctx,btn)=>`<div class="flex items-start justify-between mb-2"><div class="leading-5" style="font-size:11px">${ctx}</div>${btn||''}</div>`;
   const wBtn=(oc,col,bdr)=>`<button onclick="${oc}" class="text-xs rounded px-2 py-1 flex-shrink-0 ml-3" style="color:${col};border:1px solid ${bdr}">Withdraw</button>`;
   let html='';
-  if(tab==='vote')html=voted.map(({idea,ctx})=>card(`${topBar(ctx,wBtn(`summaryWithdrawVote('${idea.id}')`, 'var(--amber)','rgba(217,119,6,.3)'))}<p style="font-size:.9rem;color:var(--text)">${escH(idea.text)}</p>`)).join('');
-  else if(tab==='build')html=building.map(({idea,ctx,domain,appDetails})=>card(`${topBar(ctx,wBtn(`summaryWithdrawBuild('${idea.id}')`, 'var(--emerald)','rgba(5,150,105,.3)'))}<p style="font-size:.9rem;color:var(--text)">${escH(idea.text)}</p>${appDetails?`<p class="mt-2 text-xs" style="color:var(--text-3)">${escH(appDetails)}</p>`:''} ${domain?`<span class="tag-domain mt-2 inline-block">${escH(domain)}</span>`:''} ${pLine('Also building',idea.builders.filter(b=>b.email!==currentUser.email))}${pLine('🧪 Testers',idea.testers)}`)).join('');
-  else html=testing.map(({idea,ctx})=>card(`${topBar(ctx,null)}<p style="font-size:.9rem;color:var(--text)">${escH(idea.text)}</p>${pLine('🔨 Builders',idea.builders)}${pLine('Also testing',idea.testers.filter(t=>t.email!==currentUser.email))}`)).join('');
+  if(tab==='vote')html=voted.map(({idea,ctx})=>card(`${topBar(ctx,wBtn(`summaryWithdrawVote('${idea.id}')`, 'var(--amber)','rgba(217,119,6,.3)'))}<p style="font-size:.9rem;color:var(--text);white-space:pre-wrap;">${escH(idea.text)}</p>`)).join('');
+  else if(tab==='build')html=building.map(({idea,ctx,domain,appDetails})=>card(`${topBar(ctx,wBtn(`summaryWithdrawBuild('${idea.id}')`, 'var(--emerald)','rgba(5,150,105,.3)'))}<p style="font-size:.9rem;color:var(--text);white-space:pre-wrap;">${escH(idea.text)}</p>${appDetails?`<p class="mt-2 text-xs" style="color:var(--text-3);white-space:pre-wrap;">${escH(appDetails)}</p>`:''} ${domain?`<span class="tag-domain mt-2 inline-block">${escH(domain)}</span>`:''} ${pLine('Also building',idea.builders.filter(b=>b.email!==currentUser.email))}${pLine('🧪 Testers',idea.testers)}`)).join('');
+  else html=testing.map(({idea,ctx})=>card(`${topBar(ctx,null)}<p style="font-size:.9rem;color:var(--text);white-space:pre-wrap;">${escH(idea.text)}</p>${pLine('🔨 Builders',idea.builders)}${pLine('Also testing',idea.testers.filter(t=>t.email!==currentUser.email))}`)).join('');
   panel.innerHTML=html;
 }
 function setActiveSummaryTab(tab){ renderSumList(tab); }
@@ -500,7 +500,7 @@ function renderAdminTable(){
   });
   const tbody=document.getElementById('adminTbody'); if(!tbody)return;
   if(!filtered.length){tbody.innerHTML=`<tr><td colspan="5" class="px-3 py-6 text-center text-sm italic" style="color:var(--text-3)">No matching ideas</td></tr>`;return;}
-  tbody.innerHTML=filtered.map(({idea,milestone,step})=>`<tr style="border-top:1px solid var(--border)"><td class="px-3 py-2" style="font-size:12px;color:var(--text);line-height:1.5">${escH(idea.text)}</td><td class="px-3 py-2"><div class="text-xs" style="color:var(--text-2)">${escH(milestone)}</div><div class="text-xs" style="color:var(--text-3)">↳ ${escH(step)}</div></td><td class="px-3 py-2 text-center"><span class="font-semibold" style="color:var(--accent)">${(idea.votes||[]).length}</span></td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.builders||[]).length>0?(idea.builders||[]).map(b=>`${escH(b.name)}${b.domain?' · '+escH(b.domain):''}`).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.testers||[]).length>0?(idea.testers||[]).map(t=>escH(t.name)).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td></tr>`).join('');
+  tbody.innerHTML=filtered.map(({idea,milestone,step})=>`<tr style="border-top:1px solid var(--border)"><td class="px-3 py-2" style="font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap;">${escH(idea.text)}</td><td class="px-3 py-2"><div class="text-xs" style="color:var(--text-2)">${escH(milestone)}</div><div class="text-xs" style="color:var(--text-3)">↳ ${escH(step)}</div></td><td class="px-3 py-2 text-center"><span class="font-semibold" style="color:var(--accent)">${(idea.votes||[]).length}</span></td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.builders||[]).length>0?(idea.builders||[]).map(b=>`${escH(b.name)}${b.domain?' · '+escH(b.domain):''}`).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td><td class="px-3 py-2 text-xs" style="color:var(--text-2)">${(idea.testers||[]).length>0?(idea.testers||[]).map(t=>escH(t.name)).join(', '):`<span style="color:var(--text-3);font-style:italic">—</span>`}</td></tr>`).join('');
   ['noBuilders','noTesters'].forEach(key=>{ const btn=document.getElementById('adminFilter_'+key); if(!btn)return; if(_adminFilters[key]){btn.style.background='#ede9fe';btn.style.color='#4f46e5';btn.style.borderColor='#c7d2fe';}else{btn.style.background='';btn.style.color='#64748b';btn.style.borderColor='#e2e8f0';} });
 }
 function toggleAdminFilter(key){ _adminFilters[key]=!_adminFilters[key]; renderAdminTable(); }
